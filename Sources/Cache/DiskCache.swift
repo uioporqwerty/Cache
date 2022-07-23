@@ -40,7 +40,7 @@ public struct DiskCache<Element: NSCoding>: Cache {
 		}
 	}
 
-	public func set(key: String, value: Element, completion: (() -> Void)? = nil) {
+	public func set(key: String, value: Element, completion: (() -> Void)? = nil, expiration: Int = 3600) {
 		let path = pathForKey(key)
 		let fileManager = self.fileManager
 

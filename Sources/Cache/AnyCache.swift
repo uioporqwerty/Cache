@@ -3,7 +3,7 @@ public struct AnyCache<Element>: Cache {
 	// MARK: - Properties
 
 	private let _get: (String, @escaping (Element?) -> Void) -> ()
-	private let _set: (String, Element, (() -> Void)?) -> ()
+	private let _set: (String, Element, (() -> Void)?, Int) -> ()
 	private let _remove: (String, (() -> Void)?) -> ()
 	private let _removeAll: ((() -> Void)?) -> ()
 
@@ -11,7 +11,7 @@ public struct AnyCache<Element>: Cache {
 
 	public init<C: Cache>(_ cache: C) where Element == C.Element {
 		_get = { cache.get(key: $0, completion: $1) }
-		_set = { cache.set(key: $0, value: $1, completion: $2) }
+		_set = { cache.set(key: $0, value: $1, completion: $2, expiration: $3) }
 		_remove = { cache.remove(key: $0, completion: $1) }
 		_removeAll = { cache.removeAll(completion: $0) }
 	}
@@ -22,8 +22,8 @@ public struct AnyCache<Element>: Cache {
 		_get(key, completion)
 	}
 
-	public func set(key: String, value: Element, completion: (() -> Void)? = nil) {
-		_set(key, value, completion)
+	public func set(key: String, value: Element, completion: (() -> Void)? = nil, expiration: Int = 3600) {
+		_set(key, value, completion, expiration)
 	}
 
 	public func remove(key: String, completion: (() -> Void)? = nil) {

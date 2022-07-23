@@ -30,15 +30,27 @@ public final class MemoryCache<Element>: Cache {
 
 	// MARK: - Cache
 
-	public func set(key: String, value: Element, completion: (() -> Void)? = nil) {
-		storage.setObject(Box(value), forKey: key as NSString)
+	public func set(key: String, value: Element, completion: (() -> Void)? = nil, expiration: Int = 3600) {
+		let expirationDate = Date().addingTimeInterval(TimeInterval(expiration))
+		storage.setObject(Box(value, expirationDate ), forKey: key as NSString)
 		completion?()
 	}
 
 	public func get(key: String, completion: @escaping ((Element?) -> Void)) {
 		let box = storage.object(forKey: key as NSString)
-		let value = box.flatMap({ $0.value })
-		completion(value)
+		guard let box = box else {
+			completion(nil)
+			return
+		}
+		
+		let currentTime = Date()
+		
+		if (currentTime > box.expiration) {
+			completion(nil)
+		}
+		else {
+			completion(box.value)
+		}
 	}
 
 	public func remove(key: String, completion: (() -> Void)? = nil) {
@@ -60,7 +72,7 @@ public final class MemoryCache<Element>: Cache {
 		
 		set(newValue) {
 			if let newValue = newValue {
-				storage.setObject(Box(newValue), forKey: key as NSString)
+				storage.setObject(Box(newValue, Date().addingTimeInterval(3600)), forKey: key as NSString)
 			} else {
 				storage.removeObject(forKey: key as NSString)
 			}
