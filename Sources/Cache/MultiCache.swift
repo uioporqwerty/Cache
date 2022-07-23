@@ -16,7 +16,7 @@ public struct MultiCache<Element>: Cache {
 
 	// MARK: - Cache
 
-	public func set(key: String, value: Element, completion: (() -> Void)? = nil, expiration: Int = 3600) {
+	public func set(key: String, value: Element, expiration: Int = 3600, completion: (() -> Void)? = nil) {
 		coordinate(block: { cache, finish in
 			cache.set(key: key, value: value, completion: finish, expiration: expiration)
 		}, completion: completion)
