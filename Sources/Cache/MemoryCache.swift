@@ -32,7 +32,7 @@ public final class MemoryCache<Element>: Cache {
 
 	public func set(key: String, value: Element, expiration: Int = 3600, completion: (() -> Void)? = nil) {
 		let expirationDate = Date().addingTimeInterval(TimeInterval(expiration))
-		storage.setObject(Box(value, expirationDate ), forKey: key as NSString)
+		storage.setObject(Box<Element>(value, expirationDate ), forKey: key as NSString)
 		completion?()
 	}
 
